@@ -5,9 +5,6 @@ import React, { useEffect, useRef, useState } from "react";
 // Components
 import { Button } from "components/Button";
 
-import { call } from "file-loader";
-//import counter from "./counter";
-
 // Sub-component
 function Expired() {
   return (

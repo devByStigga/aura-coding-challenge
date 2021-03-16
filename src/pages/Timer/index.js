@@ -1,9 +1,12 @@
 // Globals
 import "./styles.scss";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // Components
 import { Button } from "components/Button";
+
+import { call } from "file-loader";
+//import counter from "./counter";
 
 // Sub-component
 function Expired() {
@@ -18,9 +21,42 @@ function Expired() {
 // Component
 function Timer() {
   // Hooks - state
-  const [counter, setCounter] = useState(0);
+  const [num, setNum] = useState("0:00");
+  const [pause, setPause] = useState(true);
 
-  // TODO: implement counter...
+  let intervalRef = useRef();
+
+  const decreaseNum = () => setNum((prev) => prev - 1);
+
+  useEffect(() => {
+    if (!pause) {
+      intervalRef.current = setInterval(decreaseNum, 1000);
+
+      return () => clearInterval(intervalRef.current);
+    }
+  }, [pause]);
+
+  useEffect(() => {
+    if (num == 0) {
+      clearInterval(intervalRef.current);
+      setPause(true);
+      setNum("0:00");
+    }
+  }, [num]);
+
+  const handleStart = () => {
+    setNum(60);
+    setPause((prev) => !prev);
+    if (!pause) {
+      intervalRef.current = setInterval(decreaseNum, 1000);
+    }
+  };
+
+  const handleReset = () => {
+    setNum("1:00");
+    clearInterval(intervalRef.current);
+    if (pause !== true) setPause(true);
+  };
 
   // Render
   return (
@@ -28,12 +64,20 @@ function Timer() {
       <h1>Timer</h1>
 
       <div className="aura-page-content">
-        <div className="aura-timer-clock">0:00</div>
-        {counter <= 0 ? <Expired /> : null}
+        <div className="aura-timer-clock">
+          {num == 60
+            ? "0:00"
+            : num < 10
+            ? "0:0" + num
+            : num > 0
+            ? "0:" + num
+            : num}
+        </div>
+        {num <= "0:00" ? <Expired /> : null}
 
         <div className="aura-timer-buttons">
-          <Button>Start</Button>
-          <Button>Reset</Button>
+          <Button onClick={handleStart}>Start</Button>
+          <Button onClick={handleReset}>Reset</Button>
         </div>
       </div>
     </div>
